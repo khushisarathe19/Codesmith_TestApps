@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        .container{
+            text-align: center;
+            width: 416px;
+        }
+        .converter_body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            height: 90px;
+        }
+        .input-group{
+            position: relative;
+            display: inline-block;
+            border-radius: 8px;
+        }
+        h1{
+            height: 76px;
+            border-bottom: 1px solid black;
+            padding-top: 24px;
+            padding-bottom:24px ;
+        }
+        input{
+            padding-left: 5px; 
+            width: 100px;
+        }
+        label{
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TempConv</h1>
+        <div class="converter_body"> 
+            <div class="input-group">
+                <input type="text" id="celsius" value="0">
+                <label>°C</label>
+            </div>
+            <div class="input-group">=</div>
+            <div class="input-group">
+                <input type="text" id="fahrenheit" value="32">
+                <label>°F</label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const celsiusInput = document.getElementById("celsius");
+        const fahrenheitInput = document.getElementById("fahrenheit");
+
+        const maxCelsius = 1000;
+        const minCelsius = -273.15;
+        const maxFahrenheit = 1832;
+        const minFahrenheit = -459.67;
+
+        function formatInput(value) {
+            if (value === "") return "";
+            const regex = /^\-?\d*\.?\d{0,2}$/; 
+            return regex.test(value) ? value : null;
+        }
+
+        function isWithinRange(value, min, max) {
+            return value >= min && value <= max;
+        }
+
+        celsiusInput.addEventListener("input", (e) => {
+            let value = e.target.value;
+
+            const validInput = formatInput(value);
+            if (validInput === null) {
+                celsiusInput.value = value.slice(0, -1);
+                return;
+            }
+
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                if (!isWithinRange(numValue, minCelsius, maxCelsius)) {
+                    celsiusInput.value = value.slice(0, -1);
+                    return;
+                }
+                const fahrenheit = (numValue * 1.8) + 32;
+                fahrenheitInput.value = fahrenheit.toFixed(2);
+            } else {
+                fahrenheitInput.value = "";
+            }
+        });
+
+        fahrenheitInput.addEventListener("input", (e) => {
+            let value = e.target.value;
+
+            const validInput = formatInput(value);
+            if (validInput === null) {
+                fahrenheitInput.value = value.slice(0, -1);
+                return;
+            }
+
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                if (!isWithinRange(numValue, minFahrenheit, maxFahrenheit)) {
+                    fahrenheitInput.value = value.slice(0, -1);
+                    return;
+                }
+                const celsius = (numValue - 32) / 1.8;
+                celsiusInput.value = celsius.toFixed(2);
+            } else {
+                celsiusInput.value = "";
+            }
+        });
+
+        celsiusInput.addEventListener("blur", () => {
+            if (celsiusInput.value === "") fahrenheitInput.value = "";
+        });
+
+        fahrenheitInput.addEventListener("blur", () => {
+            if (fahrenheitInput.value === "") celsiusInput.value = "";
+        });
+    </script>
+</body>
+</html>
