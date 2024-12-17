@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: whitesmoke;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      }
+      .container {
+        text-align: center;
+        width: 800px;
+        height: 352px;
+        border:  1px solid;
+        border-radius: 16px;
+      }
+
+      h1 {
+          display: flex;
+        justify-content: center;
+        align-items: center;
+
+        margin-bottom: 20px;
+        width: 800px;
+        height: 76px;
+        border-bottom: 1px solid black;
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+      .mid {
+        height: 276px;
+        width: 800px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 24px;
+        gap: 24px;
+      }
+      .left {
+        width: 320px;
+        height: 228px;
+      }
+      .right {
+        width: 416px;
+        height: 228px;
+        border: 1px solid;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+        align-items: center;
+      }
+      input {
+        padding: 8px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #555;
+      }
+
+      button {
+        padding: 8px 12px;
+        margin-right: 5px;
+        border: 1px solid black;
+        border-radius: 4px;
+
+        cursor: pointer;
+      }
+
+      button:disabled {
+        color: grey;
+        cursor: not-allowed;
+      }
+
+      ul {
+        list-style: none;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid;
+        max-height: 200px;
+        overflow: auto;
+      }
+
+      li {
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        max-height: 25px;
+      }
+
+      li:hover {
+        background-color: #f1f1f1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>CRUD</h1>
+
+      <div class="mid">
+        <div class="left">
+          <label for="filter">Filter prefix:</label>
+          <input
+            type="text"
+            id="filter"
+            placeholder="Filter here"
+            oninput="updateFilter(this.value)"
+          />
+
+          <ul id="nameList"></ul>
+        </div>
+
+        <div class="right">
+            <div>
+              <label for="name">Name:</label>
+              <input
+                type="text"
+                id="name"
+                maxlength="20"
+                oninput="checkInputs()"
+                />
+              </div>
+              <div>
+              <label for="surname">Surname:</label>
+              <input
+                type="text"
+                id="surname"
+                maxlength="20"
+                oninput="checkInputs()"
+              />
+            </div>
+            <div id="button">
+              <button id="createBtn" onclick="createEntry()" disabled>
+                Create
+              </button>
+              <button id="updateBtn" onclick="updateEntry()" disabled>
+                Update
+              </button>
+              <button id="deleteBtn" onclick="deleteEntry()" disabled>
+                Delete
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <script>
+      let namesList = [];
+      let searchValue = "";
+      let searchList = [];
+      let selectedIndex = -1;
+
+      function updateUI() {
+        const nameListElement = document.getElementById("nameList");
+        nameListElement.innerHTML = "";
+
+        searchList = namesList.filter((entry) =>
+          entry.surname.toLowerCase().includes(searchValue.toLowerCase())
+        );
+
+        searchList.forEach((entry, index) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${entry.surname}, ${entry.name}`;
+          listItem.className = index === selectedIndex ? "selected" : "";
+          listItem.onclick = () => selectEntry(index);
+          nameListElement.appendChild(listItem);
+        });
+
+        document.getElementById("updateBtn").disabled = selectedIndex === -1;
+        document.getElementById("deleteBtn").disabled = selectedIndex === -1;
+      }
+
+      function updateFilter(value) {
+        searchValue = value;
+        selectedIndex = -1;
+        resetFields(false);
+        updateUI();
+      }
+
+      function checkInputs() {
+        const name = document.getElementById("name").value.trim();
+        const surname = document.getElementById("surname").value.trim();
+        document.getElementById("createBtn").disabled = !(name && surname);
+      }
+
+      function createEntry() {
+        const name = document.getElementById("name").value.trim();
+        const surname = document.getElementById("surname").value.trim();
+        if (name && surname) {
+          namesList.unshift({ name, surname });
+          resetFields();
+          updateUI();
+        }
+      }
+
+      function selectEntry(index) {
+        selectedIndex = index;
+        const { name, surname } = searchList[index];
+        document.getElementById("name").value = name;
+        document.getElementById("surname").value = surname;
+        updateUI();
+      }
+
+      function updateEntry() {
+        if (selectedIndex > -1) {
+          const name = document.getElementById("name").value.trim();
+          const surname = document.getElementById("surname").value.trim();
+          if (name && surname) {
+            const globalIndex = namesList.indexOf(searchList[selectedIndex]);
+            namesList[globalIndex] = { name, surname };
+            resetFields(false);
+            updateUI();
+          }
+        }
+      }
+
+      function deleteEntry() {
+        if (selectedIndex > -1) {
+          const globalIndex = namesList.indexOf(searchList[selectedIndex]);
+          namesList.splice(globalIndex, 1);
+          resetFields();
+          updateUI();
+        }
+      }
+
+      function resetFields(clearValues = true) {
+        if (clearValues) {
+          document.getElementById("name").value = "";
+          document.getElementById("surname").value = "";
+        }
+        selectedIndex = -1;
+      }
+
+      updateUI();
+    </script>
+  </body>
+</html>
