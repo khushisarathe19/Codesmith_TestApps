@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0px;
+            padding: 0px;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timerbox {
+            width: 416px;
+            height: 280px;
+            border-radius: 16px;
+            border: 1px solid gray;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 416px;
+            height: 76px;
+            padding: 24px 0px;
+            border-bottom: 1px solid gray;
+        }
+
+        .body {
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+            width: 416px;
+            height: 204px;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        #data {
+            width: 368px;
+            height: 84px;
+            gap: 16px;
+            opacity: 0px;
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+            align-items: center;
+        }
+
+        .outer {
+            display: flex;
+            justify-content: stretch;
+            width: 368px;
+            height: 44px;
+            gap: 12px;
+            opacity: 0px;
+        }
+
+        .right {
+            display: flex;
+            flex-direction: column;
+            width: 250px;
+            height: 44px;
+            gap: 8px;
+        }
+        progress  {
+            width: 100%;
+        }
+
+        #elapsTime {
+            align-self: flex-end;
+        }
+
+        button {
+            width: 368px;
+            height: 48px;
+            gap: 0px;
+            opacity: 0px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="timerbox">
+        <div class="header">
+            <h3>Timer</h3>
+        </div>
+        <div class="body">
+            <div id="data">
+                <div class="outer">
+                    <div class="left">
+                        <p>Elapsed Time:</p>
+                    </div>
+                    <div class="right">
+                        <progress id="elaps" value="0"> </progress>
+                        <p id="elapsTime"> 0.0s</p>
+                    </div>
+
+                </div>
+                <div class="outer">
+                    <div class="left">
+                        <p>Duration Time:</p>
+                    </div>
+                    <div class="right">
+                        <input type="range" id="duration" name="duration" min="0" max="30" value="15" on />
+                    </div>
+                </div>
+            </div>
+            <div class="btnbox">
+                <!-- Chaange -->
+                <button id="reset">Reset Timer</button>
+            </div>
+        </div>
+    </main>
+    <script>
+
+
+        const duration = document.getElementById("duration");
+        const elps = document.getElementById("elaps")
+        let absElaps = new Date();
+        elps.max = duration.value;
+
+       
+
+        duration.addEventListener("input", () => {
+            elps.max = parseInt(duration.value);
+        })
+
+       
+        const reset = document.getElementById("reset");
+        reset.addEventListener("click", () => {
+            elps.value = 0;
+            absElaps = new Date();
+        })
+
+
+
+        setInterval(() => {
+
+            const showp = document.getElementById("elapsTime")
+
+            let crrtime = new Date();
+            var diff = ((crrtime.getTime() - absElaps.getTime()) / 1000).toFixed(1);
+
+            if (parseInt(duration.value) >= diff) {
+                elps.value = diff;
+                showp.innerText = diff + "s";
+            }
+        }, 100);
+
+
+
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
