@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CURD APPLICATIOIN</title>
+    <meta name="description" content="application to perform CURD">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0px;
+            padding: 0px;
+            font-family: Inter, sans-serif;
+        }
+
+        #curdapp {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #curdbox {
+            width: 800px;
+            height: 352px;
+            top: 79px;
+            left: 80px;
+            border-radius: 16px;
+            border: 1px solid gray;
+        }
+
+        #header {
+            width: 800px;
+            height: 76px;
+            padding: 24px 0px;
+            border-bottom: 1px solid gray;
+            text-align: center;
+        }
+
+        .body {
+            width: 800px;
+            height: 276px;
+            display: flex;
+            /* justify-content: space-between; */
+            padding: 24px;
+            gap: 24px;
+
+        }
+
+        .left {
+            width: 320px;
+            height: 228px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .left p {
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        .right {
+            width: 416px;
+            height: 228px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+
+        .right label {
+            width: 416px;
+            height: 66px;
+            gap: 6px;
+        }
+
+        label p {
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            height: 40px;
+            padding: 8px 12px;
+            gap: 8px;
+            border-radius: 8px;
+            border: 1px solid gray;
+        }
+
+        .focusUser {
+            background-color: rgb(150, 150, 150);
+        }
+
+        .userelistbox {
+            width: 320px;
+            height: 158px;
+            max-height: 256px;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid gray;
+        }
+
+        .btns {
+            width: 416px;
+            height: 48px;
+            display: flex;
+
+            gap: 8px;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        button {
+            width: 133.33px;
+            height: 48px;
+            padding: 12px 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="curdapp">
+        <main id="curdbox">
+            <div id="header">
+                <h3>CURD</h3>
+            </div>
+            <div class="body">
+                <div class="left">
+                    <div class="searchbox">
+                        <label for="search">
+                            <p>Filter prefix:</p>
+                            <input type="text" placeholder="Filter here" id="searchbar" name="search"> </input>
+                        </label>
+                    </div>
+                    <div class="userelistbox">
+                        <ul id="userlist">
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="right">
+                    <label for="name">
+                        <p>Name:</p>
+                        <input type="text" name="name" id="name" maxlength="20"> </input>
+                    </label>
+                    <label for="surname">
+                        <p>Surname:</p>
+                        <input type="text" name="surname" id="surname" maxlength="20"> </input>
+                    </label>
+                    <div class="btns">
+                        <button id="createbtn" disabled>Create</button>
+                        <button id="updatebtn" disabled>Update</button>
+                        <button id="deletebtn" disabled>Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+
+        // base variable
+        const originalUserList = [];
+        let selecteduser;
+        const username = document.getElementById("name");
+        const surname = document.getElementById("surname");
+        const search = document.getElementById("searchbar");
+
+
+        // btn 
+        const createbtn = document.getElementById("createbtn");
+        const deletebtn = document.getElementById("deletebtn");
+        const updatebtn = document.getElementById("updatebtn");
+
+        createbtn.addEventListener("click", () => createUser());
+        updatebtn.addEventListener("click", () => updateUser());
+        deletebtn.addEventListener("click", () => deleteUser());
+
+        // input Event listner
+        username.addEventListener("input", () => updateUI());
+        surname.addEventListener("input", () => updateUI());
+
+        // Search listner
+        search.addEventListener("input", () => {
+            username.value = "";
+            surname.value = "";
+            selecteduser = null;
+            updateUI();
+        })
+
+
+
+
+
+        const createUser = () => {
+            const newuser = [username.value, surname.value]
+            originalUserList.push(newuser);
+
+            if (selecteduser == null) {
+                username.value = "";
+                surname.value = "";
+            } else {
+                selecteduser = originalUserList.length - 1;
+            }
+            updateUI()
+        }
+
+
+        const deleteUser = () => {
+            originalUserList.splice(selecteduser, 1);
+            username.value = "";
+            surname.value = "";
+            selecteduser = null;
+            updateUI();
+        }
+
+        const updateUser = () => {
+            originalUserList[selecteduser] = [username.value, surname.value]
+            updateUI();
+        }
+
+
+
+        const updateUI = () => {
+            var filterlist = originalUserList.filter((user) => { return user[1].includes(search.value) });
+            renderUserList(filterlist);
+            EnableDisable()
+        }
+
+
+
+        // List Creating
+        const renderUserList = (userlist) => {
+            const listbox = document.getElementById("userlist");
+            listbox.innerHTML = "";
+
+            for (const [index, value] of userlist.entries()) {
+                var new_row = document.createElement('li');
+                new_row.id = index;
+                new_row.innerText = `${value[1]}, ${value[0]}`;
+                if (selecteduser != null && selecteduser == index) {
+                    new_row.className = "focusUser";
+                }
+                new_row.onclick = (e) => {
+                    selecteduser = parseInt(e.target.id);
+                    username.value = originalUserList[selecteduser][0];
+                    surname.value = originalUserList[selecteduser][1];
+                    updateUI()
+                }
+
+                listbox.appendChild(new_row);
+            }
+        }
+
+
+
+        // Enable Disable function
+        const EnableDisable = () => {
+            // btn disabled
+            if (username.value != "" || surname.value != "") {
+                search.value = "";
+            }
+            // Disabled if either filed is empty
+            if (username.value == "" || surname.value == "") {
+                createbtn.disabled = true;
+                updatebtn.disabled = true;
+                deletebtn.disabled = true;
+            } else {
+                createbtn.disabled = false
+                if (selecteduser != null) {
+                    deletebtn.disabled = false;
+                } else {
+                    deletebtn.disabled = true;
+                }
+                if (selecteduser == null || (originalUserList[selecteduser][0] == username.value && originalUserList[selecteduser][1] == surname.value)) {
+                    updatebtn.disabled = true;
+                } else {
+                    updatebtn.disabled = false;
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
